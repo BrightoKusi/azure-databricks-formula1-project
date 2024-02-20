@@ -39,9 +39,10 @@ races_schema = StructType(fields=[StructField('raceId', IntegerType(), False)
 
 # COMMAND ----------
 
-races_df = spark.read\
-    .schema(races_schema)\
-    .csv(f'{raw_folder_path}/races.csv')
+races_df = spark.read \
+.option("header", True) \
+.schema(races_schema) \
+.csv(f"{raw_folder_path}/races.csv")
 
 # COMMAND ----------
 
@@ -67,6 +68,7 @@ races_modified_df = ingestion_date(races_df)\
 races_renamed_df = races_modified_df.\
   withColumnRenamed('raceId', 'race_id').\
   withColumnRenamed('year', 'race_year').\
+  withColumnRenamed('circuitId', 'circuit_id').\
   withColumn('data_source', lit(p_data_source))
 
 
@@ -78,7 +80,17 @@ races_renamed_df = races_modified_df.\
 
 # COMMAND ----------
 
-races_final_df = races_renamed_df.drop('url')
+races_dropped_df = races_renamed_df.drop('url')
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### select the required columns
+# MAGIC
+
+# COMMAND ----------
+
+races_final_df = races_dropped_df.select(col('race_id'), col('race_year'), col('round'), col('circuit_id'), col('name'), col('ingestion_date'), col('race_timestamp'))
 
 # COMMAND ----------
 
@@ -88,11 +100,7 @@ races_final_df = races_renamed_df.drop('url')
 
 # COMMAND ----------
 
-races_final_df.write.mode('overwrite').partitionBy('race_year').parquet(f'{processed_folder_path}/races')
-
-# COMMAND ----------
-
-display(spark.read.parquet(f'{processed_folder_path}/races'))
+races_final_df.write.mode('overwrite').parquet(f'{processed_folder_path}/races')
 
 # COMMAND ----------
 
