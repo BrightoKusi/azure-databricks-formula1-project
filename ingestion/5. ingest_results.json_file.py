@@ -101,3 +101,7 @@ results_final_df = results_columns_df.drop('statusId')
 # COMMAND ----------
 
 results_final_df.write.mode('overwrite').partitionBy('race_id').parquet(f'{processed_folder_path}/results')
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")

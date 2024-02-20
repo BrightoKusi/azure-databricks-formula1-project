@@ -20,6 +20,12 @@ p_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+constructors_df = spark.read\
+    .option('header', True)\
+    .json(f'{raw_folder_path}/constructors.json')
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### specify schema 
 
@@ -70,3 +76,7 @@ constructors_final_df = constructors_with_column_df.drop('url')
 # COMMAND ----------
 
 constructors_final_df.write.mode('overwrite').parquet(f'{processed_folder_path}/constructors')
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")

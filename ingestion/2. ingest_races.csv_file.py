@@ -46,15 +46,25 @@ races_df = spark.read\
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ###select rename columns and add ingestion date and data source columns
+# MAGIC ###add ingestion date and concat date and time columns and convert to timestamp
 
 # COMMAND ----------
 
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import to_timestamp, lit, col, concat
 
 # COMMAND ----------
 
-races_renamed_df = ingestion_date(races_df).\
+races_modified_df = ingestion_date(races_df)\
+    .withColumn('race_timestamp', to_timestamp(concat(col('date'), lit(' '), col('time')),'yyyy-MM-dd HH:mm:ss'))
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC ###rename the columns
+
+# COMMAND ----------
+
+races_renamed_df = races_modified_df.\
   withColumnRenamed('raceId', 'race_id').\
   withColumnRenamed('year', 'race_year').\
   withColumn('data_source', lit(p_data_source))
@@ -79,3 +89,11 @@ races_final_df = races_renamed_df.drop('url')
 # COMMAND ----------
 
 races_final_df.write.mode('overwrite').partitionBy('race_year').parquet(f'{processed_folder_path}/races')
+
+# COMMAND ----------
+
+display(spark.read.parquet(f'{processed_folder_path}/races'))
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")

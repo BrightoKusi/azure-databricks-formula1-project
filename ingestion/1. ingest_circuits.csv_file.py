@@ -97,3 +97,7 @@ display(circuits_final_df)
 # COMMAND ----------
 
 circuits_final_df.write.mode('overwrite').parquet(f'{processed_folder_path}/circuits')
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")
