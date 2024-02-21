@@ -52,7 +52,7 @@ from pyspark.sql.functions import lit
 # COMMAND ----------
 
 constructors_with_column_df = ingestion_date(constructors_df).\
-  withColumnRenamed('constructorId', 'constructors_id').\
+  withColumnRenamed('constructorId', 'constructor_id').\
   withColumnRenamed('constructorRef', 'constructor_ref').\
   withColumn('data_source', lit(p_data_source))
 
