@@ -48,6 +48,12 @@ SHOW TABLES IN demo;
 
 -- COMMAND ----------
 
+-- MAGIC %python
+-- MAGIC # spark manages both metadata and data with Managed tables (chooses location and deletes data when table is dropped)
+-- MAGIC # But manages only metadata for external tables (user specifies location. data is retained when the table is dropped)
+
+-- COMMAND ----------
+
 -- MAGIC
 -- MAGIC %run "../includes/configuration"
 
