@@ -48,8 +48,8 @@ results_schema = StructType(fields=[StructField('resultId', IntegerType(), False
                                         , StructField('fastestLap', IntegerType(), True)
                                         , StructField('rank', IntegerType(), True)
                                         , StructField('fastestLapTime', StringType(), True)
-                                        , StructField('fastestLapSpeed', StringType(), True)
-                                        , StructField('StatusId', IntegerType(), True)
+                                        , StructField('fastestLapSpeed', DoubleType(), True)
+                                        , StructField('statusId', IntegerType(), True)
                                         ])
 
 # COMMAND ----------
