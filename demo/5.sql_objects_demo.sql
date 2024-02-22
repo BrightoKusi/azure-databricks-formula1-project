@@ -150,3 +150,55 @@ SELECT * FROM demo.demo_race_results_ext_py WHERE race_year = 2020;
 -- COMMAND ----------
 
 SELECT * FROM demo.race_results_ext_sql
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ### Views on tables
+-- MAGIC 1. Create Temp View (only accessible within the session ie. notebook)
+-- MAGIC 2. Create Global Temp View (accessible within the app ie. every notebook attached to the cluster)
+-- MAGIC 3. Create Permanent View
+
+-- COMMAND ----------
+
+CREATE OR REPLACE TEMP VIEW demo.v_race_results
+AS
+SELECT *
+  FROM demo.demo_race_results_python
+  WHERE race_year = 2018;
+
+-- COMMAND ----------
+
+SELECT * FROM v_race_results
+
+-- COMMAND ----------
+
+SHOW VIEWS;
+
+-- COMMAND ----------
+
+CREATE OR REPLACE GLOBAL TEMP VIEW demo.gv_race_results
+AS
+SELECT *
+  FROM demo.demo_race_results_python
+  WHERE race_year = 2012;
+
+-- COMMAND ----------
+
+SELECT * FROM global_temp.gv_race_results
+
+-- COMMAND ----------
+
+SHOW TABLES IN global_temp
+
+-- COMMAND ----------
+
+CREATE OR REPLACE VIEW demo.pv_race_results
+AS
+SELECT *
+  FROM demo.demo_race_results_python
+  WHERE race_year = 2000;
+
+-- COMMAND ----------
+
+show tables;
