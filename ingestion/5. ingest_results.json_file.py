@@ -100,7 +100,12 @@ results_final_df = results_columns_df.drop('statusId')
 
 # COMMAND ----------
 
-results_final_df.write.mode('overwrite').partitionBy('race_id').parquet(f'{processed_folder_path}/results')
+results_final_df.write.mode('overwrite').partitionBy('race_id').format("parquet").saveAsTable('f1_processed.results')
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT COUNT(*) FROM f1_processed.results
 
 # COMMAND ----------
 
