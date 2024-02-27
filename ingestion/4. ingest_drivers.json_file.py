@@ -11,8 +11,11 @@ p_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
-# MAGIC
-# MAGIC
+dbutils.widgets.text('v_file_date','2021-03-21')
+v_file_date = dbutils.widgets.get("v_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -52,7 +55,7 @@ drivers_schema = StructType(fields=[StructField('driverId', StringType(), False)
 drivers_df = spark.read\
     .option('header', True)\
     .schema(drivers_schema)\
-    .json(f'{raw_folder_path}/drivers.json')
+    .json(f'{raw_folder_path}/{v_file_date}/drivers.json')
 
 # COMMAND ----------
 

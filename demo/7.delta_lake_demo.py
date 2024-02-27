@@ -419,7 +419,12 @@ display(version2_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### convert from parquet to delta
+# MAGIC ##convert from parquet to delta
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Using the table system
 
 # COMMAND ----------
 
@@ -434,3 +439,38 @@ display(version2_df)
 # MAGIC   , updatedDate DATE
 # MAGIC )
 # MAGIC USING PARQUET
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC INSERT INTO f1_delta.drivers_convert_to_delta
+# MAGIC SELECT * FROM f1_delta.drivers_merge
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CONVERT TO DELTA f1_delta.drivers_convert_to_delta;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### OR Using the file system
+
+# COMMAND ----------
+
+#use the data and convert to df
+df = spark.table("f1_delta.drivers_convert_to_delta")
+
+# COMMAND ----------
+
+#write to delta
+df.write.format("parquet").save("/mnt/formula1bk/delta/drivers_convert_to_delta_file")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CONVERT TO DELTA parquet.`/mnt/formula1bk/delta/drivers_convert_to_delta_file`
+
+# COMMAND ----------
+
+
