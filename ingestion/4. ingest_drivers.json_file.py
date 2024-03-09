@@ -71,7 +71,9 @@ from pyspark.sql.functions import lit
 drivers_with_columns_df = ingestion_date(drivers_df).\
   withColumnRenamed('driverId', 'driver_id').\
   withColumnRenamed('driverRef', 'driver_ref').\
-  withColumn('data_source', lit(p_data_source))
+  withColumn('data_source', lit(p_data_source)).\
+  withColumn('file_date', lit(v_file_date))
+  
 
 
 
@@ -108,7 +110,7 @@ drivers_final_df = drivers_semi_final_df.drop('url')
 
 # COMMAND ----------
 
-drivers_final_df.write.mode('overwrite').format('parquet').saveAsTable('f1_processed.drivers')
+drivers_final_df.write.mode('overwrite').format('delta').saveAsTable('f1_processed.drivers')
 
 # COMMAND ----------
 

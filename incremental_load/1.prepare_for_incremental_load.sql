@@ -3,8 +3,7 @@ DROP DATABASE IF EXISTS f1_processed CASCADE;
 
 -- COMMAND ----------
 
-CREATE DATABASE IF NOT EXISTS f1_processed
-LOCATION "mnt/formula1bk/processed";
+CREATE DATABASE IF NOT EXISTS f1_processed LOCATION "/mnt/formula1bk/processed";
 
 -- COMMAND ----------
 
@@ -14,4 +13,8 @@ DROP DATABASE IF EXISTS f1_presentation CASCADE;
 -- COMMAND ----------
 
 CREATE DATABASE IF NOT EXISTS f1_presentation
-LOCATION "mnt/formula1bk/presentation";
+LOCATION "/mnt/formula1bk/presentation";
+
+-- COMMAND ----------
+
+

@@ -11,14 +11,18 @@ p_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text('v_file_date','2021-03-21')
+v_file_date = dbutils.widgets.get("v_file_date")
+
+
+# COMMAND ----------
+
 # MAGIC
 # MAGIC
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
 
-# MAGIC
-# MAGIC
 # MAGIC %run "../includes/common_functions"
 
 # COMMAND ----------
@@ -48,7 +52,7 @@ qualifying_schema = StructType(fields=[StructField('qualifyId', IntegerType(), F
 qualifying_df = spark.read\
     .schema(qualifying_schema)\
     .option('multiLine', True)\
-    .json(f'{raw_folder_path}/qualifying')
+    .json(f'{raw_folder_path}/{v_file_date}/qualifying')
 
 # COMMAND ----------
 
@@ -66,7 +70,8 @@ qualifying_final_df = ingestion_date(qualifying_df).\
   withColumnRenamed('raceId', 'race_id').\
   withColumnRenamed('constructorId', 'constructor_id').\
   withColumnRenamed('driverId', 'driver_id').\
-  withColumn('data_source', lit(p_data_source))
+  withColumn('data_source', lit(p_data_source)).\
+  withColumn('file_date', lit(v_file_date))
 
 
 
@@ -78,7 +83,23 @@ qualifying_final_df = ingestion_date(qualifying_df).\
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode('overwrite').format('parquet').saveAsTable('f1_processed.qualifying')
+merge_condition = "tgt.qualify_id = src.qualify_id AND tgt.race_id = src.race_id"
+
+
+# COMMAND ----------
+
+
+merge_delta_df(qualifying_final_df, "f1_processed", "qualifying", processed_folder_path, merge_condition, "race_id")
+
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC SELECT race_id, count(1)
+# MAGIC FROM f1_processed.qualifying
+# MAGIC GROUP BY race_id
+# MAGIC ORDER BY race_id DESC
 
 # COMMAND ----------
 

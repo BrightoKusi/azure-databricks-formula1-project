@@ -97,6 +97,15 @@ results_final_df = results_columns_df.drop('statusId')
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ### de-dupe the dataframe
+
+# COMMAND ----------
+
+results_deduped_df = results_final_df.dropDuplicates(["race_id", "driver_id"])
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ### write the final dataframe to parquet file format
 # MAGIC
 
@@ -107,16 +116,14 @@ results_final_df = results_columns_df.drop('statusId')
 
 # COMMAND ----------
 
-# #Drop partitions if exist and write them again
-
-# for race_id_list in results_final_df.select("race_id").distinct().collect():
-#     if (spark._jsparkSession.catalog().tableExists("f1_processed.results")):
-#         spark.sql(f"ALTER TABLE f1_processed.results DROP IF EXISTS PARTITION (race_id = {race_id_list.race_id})")
-
+merge_condition = "tgt.result_id = src.result_id AND tgt.race_id = src.race_id"
 
 # COMMAND ----------
 
-results_final_df.write.mode('append').partitionBy('race_id').format("parquet").saveAsTable('f1_processed.results')
+
+merge_condition = "tgt.result_id = src.result_id AND tgt.race_id = src.race_id"
+merge_delta_df(results_deduped_df, "f1_processed", "results", processed_folder_path, merge_condition, "race_id")
+
 
 # COMMAND ----------
 
@@ -126,67 +133,6 @@ results_final_df.write.mode('append').partitionBy('race_id').format("parquet").s
 # MAGIC FROM f1_processed.results
 # MAGIC GROUP BY race_id
 # MAGIC ORDER BY race_id DESC
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC --DROP TABLE IF EXISTS f1_processed.results;
-
-# COMMAND ----------
-
-# spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
-
-# COMMAND ----------
-
-# def rearrange_partition_column(input_df, partition_column):
-#     column_list = []
-#     for column_name in input_df.schema.names:
-#         if column_name != partition_column:
-#             column_list.append(column_name)
-#     column_list.append(partition_column)
-
-#     print(column_list)
-
-#     output_df = results_final_df.select(column_list)
-#     return output_df
-
-# COMMAND ----------
-
-# output_df = rearrange_partition_column(results_final_df, 'race_id')
-
-# COMMAND ----------
-
-# results_final_df = results_final_df.select("result_id", "driver_id", "constructor_id", "number", "grid", "position", "position_text", "position_order", "points", "laps", "time", "milliseconds", "fastest_lap", "rank", "fastest_lap_time", "fastest_lap_speed", "data_source", "file_date", "ingestion_date", "race_id")
-
-# COMMAND ----------
-
-# def overwrite_partition(input_df, db_name, table_name, partition_column):
-#     output_df = rearrange_partition_column(input_df, partition_column)
-    
-#     spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
-  
-#     if (spark._jsparkSession.catalog().tableExists(f"{db_name}.{table_name}")):
-#         output_df.write.mode("overwrite").insertInto(f"{db_name}.{table_name}")
-#     else:
-#         output_df.write.mode("overwrite").partitionBy(partition_column).format("parquet").saveAsTable(f"{db_name}.{table_name}")
-
-
-
-# COMMAND ----------
-
-# overwrite_partition(results_final_df, "f1_processed", "results", "race_id" )
-
-# COMMAND ----------
-
-# if (spark._jsparkSession.catalog().tableExists("f1_processed.results")):
-#     results_final_df.write.mode("overwrite").insertInto("f1_processed.results")
-# else:
-#     results_final_df.write.mode('overwrite').partitionBy('race_id').format("parquet").saveAsTable('f1_processed.results')
-
-# COMMAND ----------
-
-# %sql
-# SELECT COUNT(*) FROM f1_processed.results
 
 # COMMAND ----------
 

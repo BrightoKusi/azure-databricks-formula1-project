@@ -52,10 +52,6 @@ circuits_df = spark.read\
 
 # COMMAND ----------
 
-display(circuits_df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ###select columns and rename
 
@@ -77,7 +73,7 @@ circuits_selected_df = circuits_df.select(col('circuitId').alias('circuit_id'),\
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### add columns to show ingestion date and data source
+# MAGIC ### add columns to show ingestion date and data source and file date
 
 # COMMAND ----------
 
@@ -93,26 +89,19 @@ circuits_final_df = ingestion_date(circuits_selected_df).\
 
 # COMMAND ----------
 
-display(circuits_final_df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ### write the final dataframe to parquet file format
 # MAGIC
 
 # COMMAND ----------
 
-circuits_final_df.write.mode("overwrite").format("parquet").saveAsTable('f1_processed.circuits')
+# circuits_final_df.write.mode("overwrite").format("delta").option("path", f"{processed_folder_path}/circuits").saveAsTable("f1_processed.circuits")
+
 
 # COMMAND ----------
 
-display(spark.read.parquet(f"{processed_folder_path}/circuits"))
+circuits_final_df.write.mode("overwrite").format("delta").saveAsTable("f1_processed.circuits")
 
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT* FROM f1_processed.circuits
 
 # COMMAND ----------
 

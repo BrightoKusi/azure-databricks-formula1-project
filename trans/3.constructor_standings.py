@@ -4,11 +4,21 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-28")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
 
-race_results_df = spark.read.parquet(f'{presentation_folder_path}/race_results')
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
+race_results_df = spark.read.format("delta").load(f"{presentation_folder_path}/race_results") \
+.filter(f"file_date = '{v_file_date}'") 
 
 # COMMAND ----------
 
